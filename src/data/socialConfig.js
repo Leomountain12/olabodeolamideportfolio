@@ -1,6 +1,47 @@
+// // src/data/socialConfig.js
+
+// // Default settings (used when nothing is saved)
+// const defaultSettings = {
+//   email: "olabodeolamide323@gmail.com",
+//   phone: "+2348126332866",
+//   social: {
+//     github: "https://github.com/leodcatalyst",
+//     linkedin: "https://linkedin.com/in/leodcatalyst",
+//     twitter: "https://twitter.com/leodcatalyst",
+//     instagram: "https://instagram.com/leodcatalyst",
+//     youtube: "https://youtube.com/@leodcatalyst",
+//     tiktok: "https://tiktok.com/@leodcatalyst",
+//     facebook: "https://facebook.com/leodcatalyst",
+//   },
+//   socialOrder: ["github", "linkedin", "twitter", "instagram", "youtube", "tiktok", "facebook"],
+// };
+
+// // Load settings from localStorage or use defaults
+// export const getSocialConfig = () => {
+//   const saved = localStorage.getItem('socialSettings');
+//   if (saved) {
+//     try {
+//       const parsed = JSON.parse(saved);
+//       return {
+//         ...defaultSettings,
+//         ...parsed,
+//         social: { ...defaultSettings.social, ...parsed.social },
+//       };
+//     } catch {
+//       return defaultSettings;
+//     }
+//   }
+//   return defaultSettings;
+// };
+
+// // Save settings to localStorage
+// export const saveSocialConfig = (settings) => {
+//   localStorage.setItem('socialSettings', JSON.stringify(settings));
+// };
+
+// export default getSocialConfig;
 // src/data/socialConfig.js
 
-// Default settings (used when nothing is saved)
 const defaultSettings = {
   email: "olabodeolamide323@gmail.com",
   phone: "+2348126332866",
@@ -16,17 +57,12 @@ const defaultSettings = {
   socialOrder: ["github", "linkedin", "twitter", "instagram", "youtube", "tiktok", "facebook"],
 };
 
-// Load settings from localStorage or use defaults
 export const getSocialConfig = () => {
   const saved = localStorage.getItem('socialSettings');
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
-      return {
-        ...defaultSettings,
-        ...parsed,
-        social: { ...defaultSettings.social, ...parsed.social },
-      };
+      return { ...defaultSettings, ...parsed, social: { ...defaultSettings.social, ...parsed.social } };
     } catch {
       return defaultSettings;
     }
@@ -34,7 +70,6 @@ export const getSocialConfig = () => {
   return defaultSettings;
 };
 
-// Save settings to localStorage
 export const saveSocialConfig = (settings) => {
   localStorage.setItem('socialSettings', JSON.stringify(settings));
 };

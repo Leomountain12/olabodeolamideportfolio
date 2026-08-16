@@ -51,19 +51,19 @@
 //     }
 //   }, []);
 
-//   // ✅ AUTO-SLIDE SINGLE CARD EVERY 3 SECONDS (WITH PAUSE)
+//   // ✅ AUTO-SLIDE 2 CARDS EVERY 3 SECONDS
 //   useEffect(() => {
 //     if (featuredProjects.length === 0) return;
 //     if (isPaused) return;
 
-//     // Clear existing interval
 //     if (intervalRef.current) {
 //       clearInterval(intervalRef.current);
 //     }
 
-//     // Start new interval
 //     intervalRef.current = setInterval(() => {
-//       setCurrentIndex((prev) => (prev + 1) % featuredProjects.length);
+//       const cardsPerSlide = window.innerWidth < 768 ? 1 : 2;
+//       const totalSlides = Math.ceil(featuredProjects.length / cardsPerSlide);
+//       setCurrentIndex((prev) => (prev + 1) % totalSlides);
 //     }, 3000);
 
 //     return () => {
@@ -73,17 +73,20 @@
 //     };
 //   }, [featuredProjects.length, isPaused]);
 
+//   const cardsPerSlide = window.innerWidth < 768 ? 1 : 2;
+//   const totalSlides = Math.ceil(featuredProjects.length / cardsPerSlide);
+
 //   const goToNext = () => {
 //     if (isTransitioning || featuredProjects.length === 0) return;
 //     setIsTransitioning(true);
-//     setCurrentIndex((prev) => (prev + 1) % featuredProjects.length);
+//     setCurrentIndex((prev) => (prev + 1) % totalSlides);
 //     setTimeout(() => setIsTransitioning(false), 500);
 //   };
 
 //   const goToPrev = () => {
 //     if (isTransitioning || featuredProjects.length === 0) return;
 //     setIsTransitioning(true);
-//     setCurrentIndex((prev) => (prev === 0 ? featuredProjects.length - 1 : prev - 1));
+//     setCurrentIndex((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
 //     setTimeout(() => setIsTransitioning(false), 500);
 //   };
 
@@ -93,6 +96,15 @@
 //     setCurrentIndex(index);
 //     setTimeout(() => setIsTransitioning(false), 500);
 //   };
+
+//   // Get projects for current slide
+//   const getCurrentProjects = () => {
+//     const start = currentIndex * cardsPerSlide;
+//     const end = start + cardsPerSlide;
+//     return featuredProjects.slice(start, end);
+//   };
+
+//   const currentProjects = getCurrentProjects();
 
 //   return (
 //     <div>
@@ -143,7 +155,7 @@
 //       {/* ROTATING SKILLS */}
 //       <RotatingSkills />
 
-//       {/* ============ FEATURED PROJECTS - SINGLE CARD SLIDE ============ */}
+//       {/* ============ FEATURED PROJECTS - 2 CARDS AT A TIME ============ */}
 //       <section className="py-20 bg-gray-50">
 //         <div className="container-custom">
 //           <div className="text-center mb-10">
@@ -161,13 +173,13 @@
 //             </div>
 //           ) : (
 //             <div 
-//               className="relative max-w-4xl mx-auto"
+//               className="relative max-w-5xl mx-auto"
 //               onMouseEnter={() => setIsPaused(true)}
 //               onMouseLeave={() => setIsPaused(false)}
 //               onTouchStart={() => setIsPaused(true)}
 //               onTouchEnd={() => setTimeout(() => setIsPaused(false), 3000)}
 //             >
-//               {/* Single Card Carousel */}
+//               {/* Carousel Container */}
 //               <div className="overflow-hidden">
 //                 <div
 //                   className="flex transition-transform duration-500 ease-in-out"
@@ -175,21 +187,25 @@
 //                     transform: `translateX(-${currentIndex * 100}%)`,
 //                   }}
 //                 >
-//                   {featuredProjects.map((project) => (
+//                   {Array.from({ length: totalSlides }).map((_, slideIndex) => (
 //                     <div
-//                       key={project.id}
-//                       className="w-full flex-shrink-0 px-4"
+//                       key={slideIndex}
+//                       className="w-full flex-shrink-0 grid grid-cols-1 md:grid-cols-2 gap-6 px-2"
 //                     >
-//                       <div className="max-w-md mx-auto">
-//                         <ProjectCard project={project} />
-//                       </div>
+//                       {featuredProjects
+//                         .slice(slideIndex * cardsPerSlide, slideIndex * cardsPerSlide + cardsPerSlide)
+//                         .map((project) => (
+//                           <div key={project.id} className="max-w-md mx-auto w-full">
+//                             <ProjectCard project={project} />
+//                           </div>
+//                         ))}
 //                     </div>
 //                   ))}
 //                 </div>
 //               </div>
 
 //               {/* Navigation Arrows */}
-//               {featuredProjects.length > 1 && (
+//               {featuredProjects.length > cardsPerSlide && (
 //                 <>
 //                   <button
 //                     onClick={() => {
@@ -197,7 +213,7 @@
 //                       setIsPaused(true);
 //                       setTimeout(() => setIsPaused(false), 3000);
 //                     }}
-//                     className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 bg-white rounded-full p-2 shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 z-10"
+//                     className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 md:-translate-x-4 bg-white rounded-full p-2 shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 z-10"
 //                     aria-label="Previous"
 //                   >
 //                     <ChevronLeft size={24} />
@@ -209,7 +225,7 @@
 //                       setIsPaused(true);
 //                       setTimeout(() => setIsPaused(false), 3000);
 //                     }}
-//                     className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 bg-white rounded-full p-2 shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 z-10"
+//                     className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 md:translate-x-4 bg-white rounded-full p-2 shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 z-10"
 //                     aria-label="Next"
 //                   >
 //                     <ChevronRight size={24} />
@@ -218,9 +234,9 @@
 //               )}
 
 //               {/* Dot Indicators */}
-//               {featuredProjects.length > 1 && (
+//               {featuredProjects.length > cardsPerSlide && (
 //                 <div className="flex justify-center gap-2 mt-6">
-//                   {featuredProjects.map((_, index) => (
+//                   {Array.from({ length: totalSlides }).map((_, index) => (
 //                     <button
 //                       key={index}
 //                       onClick={() => {
@@ -240,9 +256,9 @@
 //               )}
 
 //               {/* Counter */}
-//               {featuredProjects.length > 1 && (
+//               {featuredProjects.length > cardsPerSlide && (
 //                 <div className="text-center mt-3 text-sm text-gray-400">
-//                   {currentIndex + 1} / {featuredProjects.length}
+//                   {currentIndex + 1} / {totalSlides}
 //                 </div>
 //               )}
 //             </div>
@@ -343,20 +359,19 @@
 // };
 
 // export default HomePage;
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Hero from "../components/Hero";
 import RotatingSkills from "../components/RotatingSkills";
 import ProjectCard from "../components/ProjectCard";
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { defaultProjects } from "../data/defaultData";
 
 const HomePage = () => {
   const [featuredProjects, setFeaturedProjects] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const intervalRef = useRef(null);
 
   // 10 Beautiful Background Images for Hero
   const slides = [
@@ -380,49 +395,38 @@ const HomePage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Load projects from localStorage
+  // Load projects - from localStorage or default
   useEffect(() => {
     const savedProjects = localStorage.getItem('customProjects');
     if (savedProjects) {
       try {
         const projects = JSON.parse(savedProjects);
         const validProjects = projects.filter(p => p && p.title && p.id);
-        setFeaturedProjects(validProjects);
+        if (validProjects.length > 0) {
+          setFeaturedProjects(validProjects);
+          return;
+        }
       } catch (error) {
         console.error("Error loading projects:", error);
-        setFeaturedProjects([]);
       }
     }
+    // If no custom projects, use default
+    setFeaturedProjects(defaultProjects);
   }, []);
 
-  // ✅ AUTO-SLIDE 2 CARDS EVERY 3 SECONDS
+  // Auto-slide projects every 3 seconds
   useEffect(() => {
-    if (featuredProjects.length === 0) return;
-    if (isPaused) return;
-
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-
-    intervalRef.current = setInterval(() => {
-      const cardsPerSlide = window.innerWidth < 768 ? 1 : 2;
-      const totalSlides = Math.ceil(featuredProjects.length / cardsPerSlide);
-      setCurrentIndex((prev) => (prev + 1) % totalSlides);
+    if (featuredProjects.length <= 3) return;
+    const interval = setInterval(() => {
+      goToNext();
     }, 3000);
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [featuredProjects.length, isPaused]);
-
-  const cardsPerSlide = window.innerWidth < 768 ? 1 : 2;
-  const totalSlides = Math.ceil(featuredProjects.length / cardsPerSlide);
+    return () => clearInterval(interval);
+  }, [featuredProjects.length, currentIndex]);
 
   const goToNext = () => {
     if (isTransitioning || featuredProjects.length === 0) return;
     setIsTransitioning(true);
+    const totalSlides = Math.ceil(featuredProjects.length / 3);
     setCurrentIndex((prev) => (prev + 1) % totalSlides);
     setTimeout(() => setIsTransitioning(false), 500);
   };
@@ -430,6 +434,7 @@ const HomePage = () => {
   const goToPrev = () => {
     if (isTransitioning || featuredProjects.length === 0) return;
     setIsTransitioning(true);
+    const totalSlides = Math.ceil(featuredProjects.length / 3);
     setCurrentIndex((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
     setTimeout(() => setIsTransitioning(false), 500);
   };
@@ -441,14 +446,7 @@ const HomePage = () => {
     setTimeout(() => setIsTransitioning(false), 500);
   };
 
-  // Get projects for current slide
-  const getCurrentProjects = () => {
-    const start = currentIndex * cardsPerSlide;
-    const end = start + cardsPerSlide;
-    return featuredProjects.slice(start, end);
-  };
-
-  const currentProjects = getCurrentProjects();
+  const totalSlides = Math.ceil(featuredProjects.length / 3);
 
   return (
     <div>
@@ -499,7 +497,7 @@ const HomePage = () => {
       {/* ROTATING SKILLS */}
       <RotatingSkills />
 
-      {/* ============ FEATURED PROJECTS - 2 CARDS AT A TIME ============ */}
+      {/* FEATURED PROJECTS */}
       <section className="py-20 bg-gray-50">
         <div className="container-custom">
           <div className="text-center mb-10">
@@ -516,81 +514,56 @@ const HomePage = () => {
               <p className="text-gray-500">Add your first project in the admin panel.</p>
             </div>
           ) : (
-            <div 
-              className="relative max-w-5xl mx-auto"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-              onTouchStart={() => setIsPaused(true)}
-              onTouchEnd={() => setTimeout(() => setIsPaused(false), 3000)}
-            >
-              {/* Carousel Container */}
+            <div className="relative">
               <div className="overflow-hidden">
                 <div
                   className="flex transition-transform duration-500 ease-in-out"
-                  style={{
-                    transform: `translateX(-${currentIndex * 100}%)`,
-                  }}
+                  style={{ transform: `translateX(-${currentIndex * 100}%)` }}
                 >
                   {Array.from({ length: totalSlides }).map((_, slideIndex) => (
                     <div
                       key={slideIndex}
-                      className="w-full flex-shrink-0 grid grid-cols-1 md:grid-cols-2 gap-6 px-2"
+                      className="w-full flex-shrink-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-1"
                     >
                       {featuredProjects
-                        .slice(slideIndex * cardsPerSlide, slideIndex * cardsPerSlide + cardsPerSlide)
+                        .slice(slideIndex * 3, slideIndex * 3 + 3)
                         .map((project) => (
-                          <div key={project.id} className="max-w-md mx-auto w-full">
-                            <ProjectCard project={project} />
-                          </div>
+                          <ProjectCard key={project.id} project={project} />
                         ))}
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Navigation Arrows */}
-              {featuredProjects.length > cardsPerSlide && (
+              {featuredProjects.length > 3 && (
                 <>
                   <button
-                    onClick={() => {
-                      goToPrev();
-                      setIsPaused(true);
-                      setTimeout(() => setIsPaused(false), 3000);
-                    }}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 md:-translate-x-4 bg-white rounded-full p-2 shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 z-10"
+                    onClick={goToPrev}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 bg-white rounded-full p-1.5 shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 z-10"
                     aria-label="Previous"
                   >
-                    <ChevronLeft size={24} />
+                    <ChevronLeft size={20} />
                   </button>
 
                   <button
-                    onClick={() => {
-                      goToNext();
-                      setIsPaused(true);
-                      setTimeout(() => setIsPaused(false), 3000);
-                    }}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 md:translate-x-4 bg-white rounded-full p-2 shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 z-10"
+                    onClick={goToNext}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 bg-white rounded-full p-1.5 shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 z-10"
                     aria-label="Next"
                   >
-                    <ChevronRight size={24} />
+                    <ChevronRight size={20} />
                   </button>
                 </>
               )}
 
-              {/* Dot Indicators */}
-              {featuredProjects.length > cardsPerSlide && (
+              {featuredProjects.length > 3 && (
                 <div className="flex justify-center gap-2 mt-6">
                   {Array.from({ length: totalSlides }).map((_, index) => (
                     <button
                       key={index}
-                      onClick={() => {
-                        goToSlide(index);
-                        setIsPaused(true);
-                        setTimeout(() => setIsPaused(false), 3000);
-                      }}
-                      className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                      onClick={() => goToSlide(index)}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
                         currentIndex === index
-                          ? "w-8 bg-orange-500"
+                          ? "w-6 bg-orange-500"
                           : "bg-gray-300 hover:bg-gray-400"
                       }`}
                       aria-label={`Go to slide ${index + 1}`}
@@ -598,17 +571,10 @@ const HomePage = () => {
                   ))}
                 </div>
               )}
-
-              {/* Counter */}
-              {featuredProjects.length > cardsPerSlide && (
-                <div className="text-center mt-3 text-sm text-gray-400">
-                  {currentIndex + 1} / {totalSlides}
-                </div>
-              )}
             </div>
           )}
 
-          <div className="text-center mt-10">
+          <div className="text-center mt-8">
             <Link to="/projects" className="btn-secondary inline-flex items-center gap-2 text-sm">
               View All Projects <ArrowRight size={16} />
             </Link>
@@ -625,8 +591,7 @@ const HomePage = () => {
               <h2 className="section-title">Full Stack Developer with AI Expertise</h2>
               <p className="text-gray-500 mb-4">
                 I'm Olabode Olamide (Leodcatalyst), a passionate Full Stack AI Developer 
-                with 4+ years of experience building intelligent applications. I specialize 
-                in creating seamless user experiences powered by modern AI technologies.
+                with 4+ years of experience building intelligent applications.
               </p>
               <p className="text-gray-500 mb-6">
                 From EdTech platforms to AI collaboration tools, I bring ideas to life

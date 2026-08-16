@@ -1,0 +1,86 @@
+// src/data/defaultData.js
+
+export const defaultProjects = [
+  {
+    id: "tech-school",
+    title: "Tech School",
+    category: "EdTech",
+    description: "An interactive learning platform for aspiring developers with real-time coding challenges.",
+    fullDescription: "Tech School is a comprehensive EdTech platform that provides interactive coding lessons, real-time code execution, and personalized learning paths.",
+    impact: "Over 10,000 students have used the platform to learn programming, with a 85% course completion rate.",
+    image: "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/tech-school-main.jpg",
+    tech: ["React", "Node.js", "MongoDB", "Socket.io", "Tailwind CSS"],
+    challenge: "Creating a scalable platform that could handle real-time code execution for thousands of concurrent users.",
+    solution: "Implemented WebSocket connections for live coding sessions and used worker threads for isolated code execution.",
+    gallery: [
+      "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/tech-school-1.jpg",
+      "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/tech-school-2.jpg",
+    ],
+  },
+  {
+    id: "ecommerce",
+    title: "E-commerce Company",
+    category: "E-commerce",
+    description: "Full-featured e-commerce platform with real-time inventory and AI-powered recommendations.",
+    fullDescription: "A modern e-commerce solution with real-time inventory management, AI-powered product recommendations, and seamless checkout experience.",
+    impact: "Increased conversion rates by 35% and reduced cart abandonment by 28% within 3 months.",
+    image: "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/ecommerce-main.jpg",
+    tech: ["Next.js", "Stripe", "Redis", "AI/ML", "Tailwind CSS"],
+    challenge: "Building a recommendation engine that could process user behavior in real-time.",
+    solution: "Used Redis for caching and implemented collaborative filtering algorithms for personalized recommendations.",
+    gallery: [
+      "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/ecommerce-1.jpg",
+      "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/ecommerce-2.jpg",
+    ],
+  },
+  {
+    id: "tourwayva",
+    title: "Tourwayva",
+    category: "Travel",
+    description: "Smart travel booking platform with real-time availability and price optimization.",
+    fullDescription: "Tourwayva is a comprehensive travel booking platform that connects travelers with unique experiences worldwide.",
+    impact: "Processed over $2M in bookings in the first year with a 4.8/5 average rating.",
+    image: "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/tourwayva-main.jpg",
+    tech: ["React", "GraphQL", "PostgreSQL", "AWS", "Tailwind CSS"],
+    challenge: "Aggregating real-time availability data from multiple suppliers and APIs.",
+    solution: "Built a GraphQL API gateway that unified multiple data sources with intelligent caching strategies.",
+    gallery: [
+      "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/tourwayva-1.jpg",
+      "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/tourwayva-2.jpg",
+    ],
+  },
+  {
+    id: "real-estate",
+    title: "Real Estate Platform",
+    category: "Real Estate",
+    description: "Advanced property search with 3D walkthroughs and AI-powered valuations.",
+    fullDescription: "An innovative real estate platform offering immersive 3D property tours, AI-driven property valuations, and smart search capabilities.",
+    impact: "Reduced average property search time by 60% and increased engagement by 150%.",
+    image: "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/realestate-main.jpg",
+    tech: ["Vue.js", "Django", "PostGIS", "Three.js", "Tailwind CSS"],
+    challenge: "Implementing 3D walkthroughs while maintaining fast load times.",
+    solution: "Used Three.js for 3D rendering with lazy loading and progressive enhancement techniques.",
+    gallery: [
+      "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/realestate-1.jpg",
+      "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/realestate-2.jpg",
+    ],
+  },
+  {
+    id: "ai-collab",
+    title: "AI Collaboration",
+    category: "AI Collaboration",
+    description: "Advanced RAG system for collaborative AI development with agentic workflows.",
+    fullDescription: "A cutting-edge platform enabling collaborative AI development with RAG (Retrieval-Augmented Generation) and agentic workflows.",
+    impact: "Accelerated AI development cycles by 70% and improved model accuracy by 45%.",
+    image: "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/ai-collab-main.jpg",
+    tech: ["Python", "LangChain", "Pinecone", "FastAPI", "React"],
+    challenge: "Building a system that could handle complex reasoning chains across multiple AI agents.",
+    solution: "Implemented a distributed agent architecture with vector databases for efficient knowledge retrieval.",
+    gallery: [
+      "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/ai-collab-1.jpg",
+      "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/ai-collab-2.jpg",
+    ],
+  },
+];
+
+export default defaultProjects;

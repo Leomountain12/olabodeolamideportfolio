@@ -1,50 +1,115 @@
 
+// import { useState, useEffect } from "react";
+// import { projects as defaultProjects, categories } from "../data/projects";
+// import ProjectCard from "../components/ProjectCard";
+// import CategoryFilter from "../components/CategoryFilter";
+
+// const ProjectsPage = () => {
+//   const [activeCategory, setActiveCategory] = useState("All");
+//   const [allProjects, setAllProjects] = useState(defaultProjects);
+
+//   useEffect(() => {
+//     // Load custom projects from localStorage
+//     const savedProjects = localStorage.getItem('customProjects');
+//     if (savedProjects) {
+//       const customProjects = JSON.parse(savedProjects);
+//       // Merge with default projects (custom projects override defaults with same title)
+//       const mergedProjects = [...defaultProjects];
+//       customProjects.forEach(custom => {
+//         const index = mergedProjects.findIndex(p => p.title === custom.title);
+//         if (index !== -1) {
+//           mergedProjects[index] = { ...mergedProjects[index], ...custom };
+//         } else {
+//           mergedProjects.push(custom);
+//         }
+//       });
+//       setAllProjects(mergedProjects);
+//     }
+
+//     // Listen for storage changes
+//     const handleStorageChange = (e) => {
+//       if (e.key === 'customProjects') {
+//         const updatedProjects = JSON.parse(e.newValue || '[]');
+//         const mergedProjects = [...defaultProjects];
+//         updatedProjects.forEach(custom => {
+//           const index = mergedProjects.findIndex(p => p.title === custom.title);
+//           if (index !== -1) {
+//             mergedProjects[index] = { ...mergedProjects[index], ...custom };
+//           } else {
+//             mergedProjects.push(custom);
+//           }
+//         });
+//         setAllProjects(mergedProjects);
+//       }
+//     };
+
+//     window.addEventListener('storage', handleStorageChange);
+//     return () => window.removeEventListener('storage', handleStorageChange);
+//   }, []);
+
+//   const filteredProjects =
+//     activeCategory === "All"
+//       ? allProjects
+//       : allProjects.filter((p) => p.category === activeCategory);
+
+//   return (
+//     <div className="py-20">
+//       <div className="container-custom">
+//         <div className="text-center mb-12">
+//           <h1 className="section-title">My Projects</h1>
+//           <p className="section-subtitle mx-auto">
+//             A collection of my work showcasing full-stack and AI solutions.
+//           </p>
+//         </div>
+
+//         <CategoryFilter
+//           categories={categories}
+//           activeCategory={activeCategory}
+//           onCategoryChange={setActiveCategory}
+//         />
+
+//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//           {filteredProjects.map((project) => (
+//             <ProjectCard key={project.id || project.title} project={project} />
+//           ))}
+//         </div>
+
+//         {filteredProjects.length === 0 && (
+//           <div className="text-center py-12">
+//             <p className="text-gray-500">No projects found in this category.</p>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ProjectsPage;
 import { useState, useEffect } from "react";
-import { projects as defaultProjects, categories } from "../data/projects";
+import { categories as allCategories } from "../data/projects";
 import ProjectCard from "../components/ProjectCard";
 import CategoryFilter from "../components/CategoryFilter";
+import { defaultProjects } from "../data/defaultData";
 
 const ProjectsPage = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [allProjects, setAllProjects] = useState(defaultProjects);
 
   useEffect(() => {
-    // Load custom projects from localStorage
     const savedProjects = localStorage.getItem('customProjects');
     if (savedProjects) {
-      const customProjects = JSON.parse(savedProjects);
-      // Merge with default projects (custom projects override defaults with same title)
-      const mergedProjects = [...defaultProjects];
-      customProjects.forEach(custom => {
-        const index = mergedProjects.findIndex(p => p.title === custom.title);
-        if (index !== -1) {
-          mergedProjects[index] = { ...mergedProjects[index], ...custom };
-        } else {
-          mergedProjects.push(custom);
+      try {
+        const projects = JSON.parse(savedProjects);
+        const validProjects = projects.filter(p => p && p.title && p.id);
+        if (validProjects.length > 0) {
+          setAllProjects(validProjects);
+          return;
         }
-      });
-      setAllProjects(mergedProjects);
-    }
-
-    // Listen for storage changes
-    const handleStorageChange = (e) => {
-      if (e.key === 'customProjects') {
-        const updatedProjects = JSON.parse(e.newValue || '[]');
-        const mergedProjects = [...defaultProjects];
-        updatedProjects.forEach(custom => {
-          const index = mergedProjects.findIndex(p => p.title === custom.title);
-          if (index !== -1) {
-            mergedProjects[index] = { ...mergedProjects[index], ...custom };
-          } else {
-            mergedProjects.push(custom);
-          }
-        });
-        setAllProjects(mergedProjects);
+      } catch (error) {
+        console.error("Error loading projects:", error);
       }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    }
+    setAllProjects(defaultProjects);
   }, []);
 
   const filteredProjects =
@@ -63,20 +128,22 @@ const ProjectsPage = () => {
         </div>
 
         <CategoryFilter
-          categories={categories}
+          categories={allCategories}
           activeCategory={activeCategory}
           onCategoryChange={setActiveCategory}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects.map((project) => (
-            <ProjectCard key={project.id || project.title} project={project} />
-          ))}
-        </div>
-
-        {filteredProjects.length === 0 && (
+        {filteredProjects.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">No projects found in this category.</p>
+            <div className="text-6xl mb-4">📂</div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">No Projects Found</h3>
+            <p className="text-gray-500">Add your first project in the admin panel.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProjects.map((project) => (
+              <ProjectCard key={project.id || project.title} project={project} />
+            ))}
           </div>
         )}
       </div>

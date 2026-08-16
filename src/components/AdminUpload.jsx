@@ -5,10 +5,29 @@
 //   Mail, FolderOpen, Settings, CheckCircle, 
 //   Send, User, Briefcase, MessageCircle, Plus,
 //   ExternalLink, Edit, Save, Link as LinkIcon,
-//   Github, Eye, EyeOff, Phone, Twitter, Instagram, Youtube, Linkedin
+//   Github, Eye, EyeOff, Phone, Twitter, Instagram, 
+//   Youtube, Linkedin, Facebook
 // } from "lucide-react";
 // import { categories as allCategories } from "../data/projects";
 // import { getSocialConfig, saveSocialConfig } from "../data/socialConfig";
+
+// // Custom TikTok Icon (SVG)
+// const TikTokIcon = ({ size = 20, className = "" }) => (
+//   <svg
+//     xmlns="http://www.w3.org/2000/svg"
+//     width={size}
+//     height={size}
+//     viewBox="0 0 24 24"
+//     fill="none"
+//     stroke="currentColor"
+//     strokeWidth="2"
+//     strokeLinecap="round"
+//     strokeLinejoin="round"
+//     className={className}
+//   >
+//     <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+//   </svg>
+// );
 
 // const AdminUpload = () => {
 //   // Auth states
@@ -545,7 +564,7 @@
 //                 </span>
 //               )}
 //             </button>
-//             {/* ✅ NEW SETTINGS TAB */}
+//             {/* SETTINGS TAB */}
 //             <button
 //               onClick={() => setActiveTab("settings")}
 //               className={`flex-1 py-3 px-2 text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
@@ -1118,6 +1137,34 @@
 //                     />
 //                   </div>
 
+//                   {/* TikTok - Using custom icon */}
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+//                       <TikTokIcon size={16} className="text-black" /> TikTok
+//                     </label>
+//                     <input
+//                       type="url"
+//                       value={socialSettings.social?.tiktok || ""}
+//                       onChange={(e) => handleSocialChange("tiktok", e.target.value)}
+//                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+//                       placeholder="https://tiktok.com/@yourusername"
+//                     />
+//                   </div>
+
+//                   {/* Facebook */}
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+//                       <Facebook size={16} className="text-blue-600" /> Facebook
+//                     </label>
+//                     <input
+//                       type="url"
+//                       value={socialSettings.social?.facebook || ""}
+//                       onChange={(e) => handleSocialChange("facebook", e.target.value)}
+//                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+//                       placeholder="https://facebook.com/yourusername"
+//                     />
+//                   </div>
+
 //                   {/* Save Button */}
 //                   <button
 //                     onClick={handleSaveSettings}
@@ -1244,6 +1291,7 @@ import {
 } from "lucide-react";
 import { categories as allCategories } from "../data/projects";
 import { getSocialConfig, saveSocialConfig } from "../data/socialConfig";
+import { defaultProjects } from "../data/defaultData";
 
 // Custom TikTok Icon (SVG)
 const TikTokIcon = ({ size = 20, className = "" }) => (
@@ -1667,6 +1715,16 @@ const AdminUpload = () => {
   };
 
   const unreadCount = messages.filter(msg => !msg.read).length;
+
+  // ==================== SEED DEFAULT PROJECTS ====================
+  
+  const seedDefaultProjects = () => {
+    if (window.confirm("Load default projects? This will replace all custom projects.")) {
+      localStorage.setItem('customProjects', JSON.stringify(defaultProjects));
+      alert("✅ Default projects loaded! Refreshing...");
+      window.location.reload();
+    }
+  };
 
   // ==================== LOGIN MODAL ====================
   
@@ -2371,7 +2429,7 @@ const AdminUpload = () => {
                     />
                   </div>
 
-                  {/* TikTok - Using custom icon */}
+                  {/* TikTok */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                       <TikTokIcon size={16} className="text-black" /> TikTok
@@ -2415,6 +2473,20 @@ const AdminUpload = () => {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* ============ SEED DEFAULT PROJECTS BUTTON ============ */}
+          <div className="border-t border-gray-200 p-2 bg-gray-50 text-center">
+            <button
+              onClick={seedDefaultProjects}
+              className="text-xs text-blue-500 hover:text-blue-700 transition-colors"
+            >
+              📦 Load Default Projects
+            </button>
+            <span className="text-xs text-gray-400 mx-2">•</span>
+            <p className="text-xs text-gray-400 inline">
+              🔒 Only you can see this panel • Logged in as Admin
+            </p>
           </div>
 
           {/* ============ REPLY MODAL ============ */}
@@ -2500,13 +2572,6 @@ const AdminUpload = () => {
               </div>
             </div>
           )}
-
-          {/* FOOTER */}
-          <div className="border-t border-gray-200 p-2 bg-gray-50 text-center">
-            <p className="text-xs text-gray-400">
-              🔒 Only you can see this panel • Logged in as Admin
-            </p>
-          </div>
         </div>
       )}
     </div>
