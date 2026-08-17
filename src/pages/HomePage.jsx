@@ -372,6 +372,16 @@ const HomePage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Check screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // 10 Beautiful Background Images for Hero
   const slides = [
@@ -410,23 +420,25 @@ const HomePage = () => {
         console.error("Error loading projects:", error);
       }
     }
-    // If no custom projects, use default
     setFeaturedProjects(defaultProjects);
   }, []);
 
+  // Calculate cards per slide based on screen size
+  const cardsPerSlide = isMobile ? 1 : 2;
+  const totalSlides = Math.ceil(featuredProjects.length / cardsPerSlide);
+
   // Auto-slide projects every 3 seconds
   useEffect(() => {
-    if (featuredProjects.length <= 3) return;
+    if (featuredProjects.length <= cardsPerSlide) return;
     const interval = setInterval(() => {
       goToNext();
     }, 3000);
     return () => clearInterval(interval);
-  }, [featuredProjects.length, currentIndex]);
+  }, [featuredProjects.length, currentIndex, cardsPerSlide]);
 
   const goToNext = () => {
     if (isTransitioning || featuredProjects.length === 0) return;
     setIsTransitioning(true);
-    const totalSlides = Math.ceil(featuredProjects.length / 3);
     setCurrentIndex((prev) => (prev + 1) % totalSlides);
     setTimeout(() => setIsTransitioning(false), 500);
   };
@@ -434,7 +446,6 @@ const HomePage = () => {
   const goToPrev = () => {
     if (isTransitioning || featuredProjects.length === 0) return;
     setIsTransitioning(true);
-    const totalSlides = Math.ceil(featuredProjects.length / 3);
     setCurrentIndex((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
     setTimeout(() => setIsTransitioning(false), 500);
   };
@@ -445,8 +456,6 @@ const HomePage = () => {
     setCurrentIndex(index);
     setTimeout(() => setIsTransitioning(false), 500);
   };
-
-  const totalSlides = Math.ceil(featuredProjects.length / 3);
 
   return (
     <div>
@@ -497,7 +506,7 @@ const HomePage = () => {
       {/* ROTATING SKILLS */}
       <RotatingSkills />
 
-      {/* FEATURED PROJECTS */}
+      {/* FEATURED PROJECTS - 1 CARD MOBILE, 2 CARDS DESKTOP */}
       <section className="py-20 bg-gray-50">
         <div className="container-custom">
           <div className="text-center mb-10">
@@ -514,56 +523,65 @@ const HomePage = () => {
               <p className="text-gray-500">Add your first project in the admin panel.</p>
             </div>
           ) : (
-            <div className="relative">
+            <div className="relative max-w-5xl mx-auto">
+              {/* Carousel Container */}
               <div className="overflow-hidden">
                 <div
                   className="flex transition-transform duration-500 ease-in-out"
-                  style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                  style={{
+                    transform: `translateX(-${currentIndex * 100}%)`,
+                  }}
                 >
                   {Array.from({ length: totalSlides }).map((_, slideIndex) => (
                     <div
                       key={slideIndex}
-                      className="w-full flex-shrink-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-1"
+                      className={`w-full flex-shrink-0 grid gap-6 px-2 ${
+                        isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"
+                      }`}
                     >
                       {featuredProjects
-                        .slice(slideIndex * 3, slideIndex * 3 + 3)
+                        .slice(slideIndex * cardsPerSlide, slideIndex * cardsPerSlide + cardsPerSlide)
                         .map((project) => (
-                          <ProjectCard key={project.id} project={project} />
+                          <div key={project.id} className="max-w-md mx-auto w-full">
+                            <ProjectCard project={project} />
+                          </div>
                         ))}
                     </div>
                   ))}
                 </div>
               </div>
 
-              {featuredProjects.length > 3 && (
+              {/* Navigation Arrows */}
+              {featuredProjects.length > cardsPerSlide && (
                 <>
                   <button
                     onClick={goToPrev}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 bg-white rounded-full p-1.5 shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 z-10"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 md:-translate-x-4 bg-white rounded-full p-2 shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 z-10"
                     aria-label="Previous"
                   >
-                    <ChevronLeft size={20} />
+                    <ChevronLeft size={24} />
                   </button>
 
                   <button
                     onClick={goToNext}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 bg-white rounded-full p-1.5 shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 z-10"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 md:translate-x-4 bg-white rounded-full p-2 shadow-lg hover:bg-orange-500 hover:text-white transition-all duration-300 z-10"
                     aria-label="Next"
                   >
-                    <ChevronRight size={20} />
+                    <ChevronRight size={24} />
                   </button>
                 </>
               )}
 
-              {featuredProjects.length > 3 && (
+              {/* Dot Indicators */}
+              {featuredProjects.length > cardsPerSlide && (
                 <div className="flex justify-center gap-2 mt-6">
                   {Array.from({ length: totalSlides }).map((_, index) => (
                     <button
                       key={index}
                       onClick={() => goToSlide(index)}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                         currentIndex === index
-                          ? "w-6 bg-orange-500"
+                          ? "w-8 bg-orange-500"
                           : "bg-gray-300 hover:bg-gray-400"
                       }`}
                       aria-label={`Go to slide ${index + 1}`}
@@ -571,10 +589,17 @@ const HomePage = () => {
                   ))}
                 </div>
               )}
+
+              {/* Counter */}
+              {featuredProjects.length > cardsPerSlide && (
+                <div className="text-center mt-3 text-sm text-gray-400">
+                  {currentIndex + 1} / {totalSlides}
+                </div>
+              )}
             </div>
           )}
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-10">
             <Link to="/projects" className="btn-secondary inline-flex items-center gap-2 text-sm">
               View All Projects <ArrowRight size={16} />
             </Link>
