@@ -47,6 +47,10 @@ const AdminUpload = () => {
   // 🔐 PASSWORD ONLY FROM .env - NO FALLBACK!
   const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
   
+  // Cloudinary Cloud Name
+  const CLOUD_NAME = "g77vrcnu";
+  const UPLOAD_PRESET = "portfolio_upload";
+  
   // Profile image states
   const [images, setImages] = useState([]);
   const [profileFile, setProfileFile] = useState(null);
@@ -171,7 +175,7 @@ const AdminUpload = () => {
     }
   };
 
-  // ✅ UPDATED: Upload to Cloudinary
+  // ✅ Upload profile image to Cloudinary
   const uploadProfileImage = async () => {
     if (!profileFile) {
       alert("Please select a profile image first!");
@@ -183,11 +187,11 @@ const AdminUpload = () => {
     try {
       const formData = new FormData();
       formData.append("file", profileFile);
-      formData.append("upload_preset", "portfolio_upload");
-      formData.append("folder", "portfolio");
+      formData.append("upload_preset", UPLOAD_PRESET);
+      formData.append("folder", "portfolio/profile");
 
       const response = await fetch(
-        `https://api.cloudinary.com/v1_1/leodcatalyst/image/upload`,
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
         {
           method: "POST",
           body: formData,
@@ -210,7 +214,6 @@ const AdminUpload = () => {
         setImages(updatedImages);
         localStorage.setItem('adminImages', JSON.stringify(updatedImages));
         
-        // ✅ Save Cloudinary URL for all browsers
         localStorage.setItem('profileImageUrl', cloudinaryUrl);
 
         setProfileFile(null);
@@ -220,7 +223,7 @@ const AdminUpload = () => {
         
         window.dispatchEvent(new Event('storage'));
         setTimeout(() => setUploadSuccess(false), 3000);
-        alert("✅ Profile image uploaded to Cloudinary! Will show on ALL browsers.");
+        alert("✅ Profile image uploaded to Cloudinary!");
         
         window.location.reload();
       } else {
@@ -247,7 +250,8 @@ const AdminUpload = () => {
     }
   };
 
-  const uploadProjectImage = () => {
+  // ✅ Upload project images to Cloudinary
+  const uploadProjectImage = async () => {
     if (!projectFile) {
       alert("Please select a project image first!");
       return;
@@ -258,38 +262,63 @@ const AdminUpload = () => {
     }
 
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const newImage = {
-        id: Date.now(),
-        src: event.target.result,
-        name: projectFile.name,
-        projectName: selectedProject,
-        type: 'project',
-        date: new Date().toLocaleString()
-      };
-      const updatedImages = [newImage, ...projectImages];
-      setProjectImages(updatedImages);
-      localStorage.setItem('projectImages', JSON.stringify(updatedImages));
-      setProjectFile(null);
-      setProjectPreview(null);
-      setSelectedProject("");
-      setUploading(false);
-      
-      const savedProjects = localStorage.getItem('customProjects');
-      if (savedProjects) {
-        const projects = JSON.parse(savedProjects);
-        const updatedProjects = projects.map(p => 
-          p.title === selectedProject ? { ...p, image: newImage.src } : p
-        );
-        localStorage.setItem('customProjects', JSON.stringify(updatedProjects));
-        setCustomProjects(updatedProjects);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", projectFile);
+      formData.append("upload_preset", UPLOAD_PRESET);
+      formData.append("folder", `portfolio/projects`);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const cloudinaryUrl = data.secure_url;
+
+        const newImage = {
+          id: Date.now(),
+          src: cloudinaryUrl,
+          name: projectFile.name,
+          projectName: selectedProject,
+          type: 'project',
+          date: new Date().toLocaleString()
+        };
+        const updatedImages = [newImage, ...projectImages];
+        setProjectImages(updatedImages);
+        localStorage.setItem('projectImages', JSON.stringify(updatedImages));
+        
+        const savedProjects = localStorage.getItem('customProjects');
+        if (savedProjects) {
+          const projects = JSON.parse(savedProjects);
+          const updatedProjects = projects.map(p => 
+            p.title === selectedProject ? { ...p, image: cloudinaryUrl } : p
+          );
+          localStorage.setItem('customProjects', JSON.stringify(updatedProjects));
+          setCustomProjects(updatedProjects);
+        }
+
+        setProjectFile(null);
+        setProjectPreview(null);
+        setSelectedProject("");
+        setUploading(false);
+        
+        window.dispatchEvent(new Event('storage'));
+        alert("✅ Project image uploaded to Cloudinary!");
+      } else {
+        throw new Error(data.error?.message || "Upload failed");
       }
-      
-      window.dispatchEvent(new Event('storage'));
-      alert("✅ Project image uploaded successfully!");
-    };
-    reader.readAsDataURL(projectFile);
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("❌ Failed to upload image. Please try again.");
+      setUploading(false);
+    }
   };
 
   // ==================== PROJECT CRUD FUNCTIONS ====================
@@ -919,8 +948,7 @@ const AdminUpload = () => {
                       <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                     ) : (
                       <>
-                        <Send size={16} /> Upload Project Image
-                      </>
+                        <Send size={16} /> Upload Project Image                      </>
                     )}
                   </button>
                 </div>
