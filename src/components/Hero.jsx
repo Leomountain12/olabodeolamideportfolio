@@ -2,8 +2,23 @@
 // import { Link } from "react-router-dom";
 // import { ArrowRight, Code2, Sparkles, Zap } from "lucide-react";
 // import { motion } from "framer-motion";
+// import { useState, useEffect } from "react"; // Added useState and useEffect
 
 // const Hero = () => {
+//   // Added state for your uploaded image
+//   const [profileImage, setProfileImage] = useState(null);
+//   // Added state for the full-screen view modal
+//   const [isFullView, setIsFullView] = useState(false);
+
+//   // Added logic to fetch the uploaded image from local storage
+//   useEffect(() => {
+//     const savedUrl = localStorage.getItem('profileImageUrl');
+//     // Only use it if it's a valid string (ignores "null" or empty strings)
+//     if (savedUrl && savedUrl !== "null" && savedUrl.trim() !== "") {
+//       setProfileImage(savedUrl);
+//     }
+//   }, []);
+
 //   return (
 //     <section className="min-h-[90vh] flex items-center relative overflow-hidden">
 //       <div className="container-custom py-20">
@@ -70,9 +85,18 @@
 //             transition={{ duration: 0.6, delay: 0.2 }}
 //             className="relative flex justify-center"
 //           >
-//             <div className="relative w-72 h-72 sm:w-96 sm:h-96">
+//             {/* Added 'cursor-pointer' and onClick to open modal */}
+//             <div 
+//               className="relative w-72 h-72 sm:w-96 sm:h-96 cursor-pointer" 
+//               onClick={() => setIsFullView(true)}
+//             >
+//               {/* 
+//                 THE ONLY CHANGE:
+//                 Replaced the hardcoded Cloudinary URL with a conditional. 
+//                 If you uploaded an image, it shows that. If not, it falls back to your original Cloudinary link.
+//               */}
 //               <img
-//                 src="https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/profile.jpg"
+//                 src={profileImage || "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/profile.jpg"}
 //                 alt="Olabode Olamide - Leodcatalyst"
 //                 className="w-full h-full rounded-full object-cover border-4 border-orange-500/30 shadow-2xl"
 //                 loading="lazy"
@@ -87,6 +111,28 @@
 //           </motion.div>
 //         </div>
 //       </div>
+
+//       {/* FULL SCREEN MODAL - Triggered when the profile image is clicked */}
+//       {isFullView && (
+//         <div
+//           className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+//           onClick={() => setIsFullView(false)} // Click outside the image to close
+//         >
+//           <img
+//             src={profileImage || "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/profile.jpg"}
+//             alt="Olabode Olamide - Full View"
+//             className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl"
+//             // Prevent clicking the image itself from closing the modal
+//             onClick={(e) => e.stopPropagation()} 
+//           />
+//           <button
+//             className="absolute top-6 right-6 text-white text-4xl hover:text-orange-400 transition-colors"
+//             onClick={() => setIsFullView(false)}
+//           >
+//             ✕
+//           </button>
+//         </div>
+//       )}
 //     </section>
 //   );
 // };
@@ -95,19 +141,28 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Code2, Sparkles, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react"; // Added useState and useEffect
+import { useState, useEffect } from "react";
 
 const Hero = () => {
-  // Added state for your uploaded image
   const [profileImage, setProfileImage] = useState(null);
+  const [isFullView, setIsFullView] = useState(false);
 
-  // Added logic to fetch the uploaded image from local storage
   useEffect(() => {
-    const savedUrl = localStorage.getItem('profileImageUrl');
-    // Only use it if it's a valid string (ignores "null" or empty strings)
-    if (savedUrl && savedUrl !== "null" && savedUrl.trim() !== "") {
-      setProfileImage(savedUrl);
-    }
+    // 🚀 FIX: Fetch from your API so it works in ALL browsers
+    const fetchProfileImage = async () => {
+      try {
+        // ⚠️ REPLACE '/api/get-profile-image' with your actual backend URL (e.g. https://your-site.com/api/image)
+        const response = await fetch('/api/get-profile-image');
+        const data = await response.json();
+        
+        if (data && data.imageUrl) {
+          setProfileImage(data.imageUrl);
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile image:", error);
+      }
+    };
+    fetchProfileImage();
   }, []);
 
   return (
@@ -176,12 +231,10 @@ const Hero = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="relative flex justify-center"
           >
-            <div className="relative w-72 h-72 sm:w-96 sm:h-96">
-              {/* 
-                THE ONLY CHANGE:
-                Replaced the hardcoded Cloudinary URL with a conditional. 
-                If you uploaded an image, it shows that. If not, it falls back to your original Cloudinary link.
-              */}
+            <div 
+              className="relative w-72 h-72 sm:w-96 sm:h-96 cursor-pointer" 
+              onClick={() => setIsFullView(true)}
+            >
               <img
                 src={profileImage || "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/profile.jpg"}
                 alt="Olabode Olamide - Leodcatalyst"
@@ -198,6 +251,27 @@ const Hero = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* FULL SCREEN MODAL */}
+      {isFullView && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setIsFullView(false)}
+        >
+          <img
+            src={profileImage || "https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/profile.jpg"}
+            alt="Olabode Olamide - Full View"
+            className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            className="absolute top-6 right-6 text-white text-4xl hover:text-orange-400 transition-colors"
+            onClick={() => setIsFullView(false)}
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </section>
   );
 };
