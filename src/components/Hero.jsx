@@ -196,15 +196,13 @@
 // };
 
 // export default Hero;
-// src/components/Hero.jsx
 import { Link } from "react-router-dom";
 import { ArrowRight, Code2, Sparkles, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import DisplayImage from "./DisplayImage";
 
 const Hero = () => {
   return (
-    <section className="min-h-[90vh] flex items-center">
+    <section className="min-h-[90vh] flex items-center relative overflow-hidden">
       <div className="container-custom py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div
@@ -270,10 +268,11 @@ const Hero = () => {
             className="relative flex justify-center"
           >
             <div className="relative w-72 h-72 sm:w-96 sm:h-96">
-              <DisplayImage
-                className="w-full h-full rounded-full object-cover border-4 border-orange-500/30 shadow-2xl"
+              <img
+                src="https://res.cloudinary.com/leodcatalyst/image/upload/v1/portfolio/profile.jpg"
                 alt="Olabode Olamide - Leodcatalyst"
-                fallbackText="Upload your photo"
+                className="w-full h-full rounded-full object-cover border-4 border-orange-500/30 shadow-2xl"
+                loading="lazy"
               />
               <div className="absolute -top-4 -right-4 p-3 bg-white/10 backdrop-blur-md rounded-xl shadow-lg animate-bounce border border-white/20">
                 <Zap className="text-orange-400" size={24} />
